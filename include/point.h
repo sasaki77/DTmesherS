@@ -1,7 +1,8 @@
 #ifndef POINT_H
 #define POINT_H
 
-class Point{
+class Point
+{
 	private:
 		double x,y;
 
@@ -23,5 +24,29 @@ class Point{
 		}
 };
 
+class Node: public Point
+{
+	private:
+		static   unsigned int num_node;
+		unsigned int number;
+		double       val;
+	
+	public:
+		Node():Point(){
+			number = num_node++;
+			val    = 0;
+		}
+
+		Node(double _x, double _y):Point(_x, _y){
+			number = num_node++;
+			val    = 0;
+		}
+
+		unsigned int getNum(){
+			return number;
+		}
+};
+
+unsigned int Node::num_node = 0;
 
 #endif /* end of include guard */
