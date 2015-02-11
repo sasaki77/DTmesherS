@@ -21,9 +21,25 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 		fi
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $< 
 
+# program test
+MAIN = $(OBJ_DIR)/main.o
+OBJS_NOMAIN = $(filter-out $(MAIN),$(OBJS))
+TEST_DIR    = ./test
+TEST_TARGET = $(TEST_DIR)/test
+TEST_OBJ    = $(TEST_TARGET).o
+
+dotest: test
+	$(TEST_TARGET)
+
+test: $(TEST_OBJ) $(OBJS_NOMAIN) $(LIBS)
+	$(CC) -o $(TEST_DIR)/$@ $(TEST_OBJ) $(OBJS_NOMAIN)
+
+$(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
 clean:
-	$(RM) $(OBJS) $(TARGET) $(DEPENDS)
+	$(RM) $(OBJS) $(TARGET) $(DEPENDS) $(TEST_TARGET) $(TEST_OBJ)
 
 -include $(DEPENDS)
 
-.PHONY: all clean
+.PHONY: all clean dotest

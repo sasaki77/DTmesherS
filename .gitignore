@@ -1,3 +1,5 @@
 *.swp
-build/*
+*.o
+*.d
 DTmesherS
+test/test
