@@ -47,6 +47,4 @@ class Node: public Point
 		}
 };
 
-unsigned int Node::num_node = 0;
-
 #endif /* end of include guard */
