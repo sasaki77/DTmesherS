@@ -12,5 +12,9 @@ bool DT::startDT() {
 		cout << i << ":(" << nodes[i]->getX() << "," << nodes[i]->getY() << ")" << endl;
 	}
 
+	for (int i = 0; i < edges.size(); i++) {
+		cout << i << ":length = "  << edges[i]->getLength() << ", bc = " << edges[i]->getBC() << "," << edges[i]->getBCVal()  << endl;
+	}
+
 	return true;
 }

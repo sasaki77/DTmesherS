@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "point.h"
+#include "edge.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ class DT {
 		int form;
 
 		vector< Node* >     nodes;
+        vector< Edge* >     edges;
 
 		bool inputParam();
 };

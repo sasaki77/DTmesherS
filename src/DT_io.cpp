@@ -17,13 +17,14 @@ enum READ_STATE{
 	STATE_BND,
 };
 
-static bool isCommentLine( char *);
-static vector<string> parseStringLine( char *);
+static bool isCommentLine( char * );
+static vector<string> parseStringLine( char * );
 
 using namespace std;
 
 
-bool DT::inputParam() {
+bool DT::inputParam() 
+{
 	cout << "input stage" << endl;
 
 	ifstream ifs( ( infile_name + ".in" ).c_str() );
@@ -66,44 +67,76 @@ bool DT::inputParam() {
 			static double    scale = 1;
 
 			switch( read_state ){
-				case STATE_PARAMS: 
-					// 事前に必要なパラメータ情報の入力
-					if(vs[0] == "$form"){
-						form = atoi( vs[1].c_str() );
-						//if(vs.size() > 2 && vs[2] == "-obl")
-						//	// 偏平率分割が指定されている場合
-						//	useOblDivide = true;
-					}
-					if(vs[0] == "$scale")    scale    = atof( vs[1].c_str() );
-					//if(vs[0] == "$interval") interval = atof( vs[1].c_str() ) * scale;
-					break;
+				case STATE_PARAMS:
+                    {
+                        // 事前に必要なパラメータ情報の入力
+                        if(vs[0] == "$form"){
+                            form = atoi( vs[1].c_str() );
+                            //if(vs.size() > 2 && vs[2] == "-obl")
+                            //	// 偏平率分割が指定されている場合
+                            //	useOblDivide = true;
+                        }
+                        if(vs[0] == "$scale")    scale    = atof( vs[1].c_str() );
+                        //if(vs[0] == "$interval") interval = atof( vs[1].c_str() ) * scale;
+                        break;
+                    }
 
-				case STATE_NODE:
-					// ノード情報の入力
-					nodes.push_back( new Node(scale * atof(vs[1].c_str()),
-								scale * atof(vs[2].c_str() ) ));
-	
-					//nodes.at( node.size()-1 )->isOnBnd = true;
-					break;
-			}
-		}
-	}
+                case STATE_NODE:
+                    {
+                        // ノード情報の入力
+                        double px = scale * atof( vs[1].c_str() );
+                        double py = scale * atof( vs[2].c_str() );
+                        nodes.push_back( new Node( px, py ) );
+
+                        //nodes.at( node.size()-1 )->isOnBnd = true;
+                        break;
+                    }
+
+                case STATE_EDGE:
+                    {
+                        // 辺情報の入力
+                        // 線の種類
+                        if(vs[3] == "$str"){
+                            Node* node1 = nodes[ atoi( vs[1].c_str() )-1 ];
+                            Node* node2 = nodes[ atoi( vs[2].c_str() )-1 ];
+                            edges.push_back( new StraightEdge( node1, node2 ) );
+                        }
+
+                        //}else if(vs[3] == "$cir"){
+                        //    parseStrWithComma( vs[4],varg );
+                        //    edge.push_back( new CircleEdge( node[atoi(vs[1].c_str())-1],
+                        //                node[atoi(vs[2].c_str())-1], 
+                        //                scale * atof(varg[1].c_str()),
+                        //                scale * atof(varg[2].c_str()),
+                        //                atof(varg[3].c_str())          ));
+                        //}
+
+                        // 境界条件
+                        if(vs[5] == "$dirichlet"){
+                            double val = atof(vs[6].c_str());
+                            edges[edges.size()-1]->setBC( COND_DIRICHLET, val );
+                        }else if(vs[5] == "$neumann"){
+                            edges[edges.size()-1]->setBC( COND_NEUMANN, 0 );
+                        }
+                    }
+             }
+        }
+    }
 
 	return true;
 }
 
-static bool isCommentLine(char* line )
+static bool isCommentLine( char* line )
 {
-	if( line[0] == '#'  || line[0] == '\n' ||
+    if( line[0] == '#'  || line[0] == '\n' ||
 			line[0] == '\r' || line[0] == '\0'){
-		cout << line << endl;
 		return true;
 	}
 
 	return false;
 }
 
-static vector<string> parseStringLine( char* line)
+static vector<string> parseStringLine( char* line )
 {
 	// line = "This is Test"
 	// vs   = ["This","is","Test"]
