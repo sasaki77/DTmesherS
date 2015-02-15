@@ -1,10 +1,12 @@
 #include <iostream>
+#include "DT.h"
 
 using namespace std;
 
 int main(int argc, char const* argv[])
 {
-	cout << "this is mesher" << endl;
+	DT dt;
+	dt.startDT();
 	
 	return 0;
 }
