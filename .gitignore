@@ -3,3 +3,4 @@
 *.d
 DTmesherS
 test/test
+data/*
