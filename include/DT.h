@@ -20,7 +20,8 @@ class DT {
 		};
 
 	private:
-		Point max_point, min_point;
+		Point  max_point, min_point;
+        double max_distance;
 		string infile_name;
 		string outfile_name;
 		int form;
@@ -29,6 +30,8 @@ class DT {
         vector< Edge* >     edges;
 
 		bool inputParam();
+        void nodesNormalize();      // nodesNormalize()で全ての節点を0<=x<=1,0<=y<=1に規格化する
+        void nodesDenormalize();
 };
 
 #endif /* end of include guard */
