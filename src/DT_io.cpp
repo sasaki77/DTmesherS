@@ -19,6 +19,8 @@ enum READ_STATE{
 
 static bool isCommentLine( char * );
 static vector<string> parseStringLine( char * );
+static Node* createNewNodeFromVs( const vector<string>& , double );
+static Edge* createNewEdgeFromVs( const vector<string>& , double, const vector<Node*>& );
 
 using namespace std;
 
@@ -84,9 +86,8 @@ bool DT::inputParam()
                 case STATE_NODE:
                     {
                         // ノード情報の入力
-                        double px = scale * atof( vs[1].c_str() );
-                        double py = scale * atof( vs[2].c_str() );
-                        nodes.push_back( new Node( px, py ) );
+                        Node* new_node = createNewNodeFromVs( vs, scale );
+                        nodes.push_back( new_node );
 
                         //nodes.at( node.size()-1 )->isOnBnd = true;
                         break;
@@ -94,38 +95,10 @@ bool DT::inputParam()
 
                 case STATE_EDGE:
                     {
-                        // 辺情報の入力
-                        // 線の種類
-                        if(vs[3] == "$str"){
-                            Node* node1 = nodes[ atoi( vs[1].c_str() )-1 ];
-                            Node* node2 = nodes[ atoi( vs[2].c_str() )-1 ];
-                            edges.push_back( new StraightEdge( node1, node2 ) );
-                        }
-
-                        //}else if(vs[3] == "$cir"){
-                        //    parseStrWithComma( vs[4],varg );
-                        //    edge.push_back( new CircleEdge( node[atoi(vs[1].c_str())-1],
-                        //                node[atoi(vs[2].c_str())-1], 
-                        //                scale * atof(varg[1].c_str()),
-                        //                scale * atof(varg[2].c_str()),
-                        //                atof(varg[3].c_str())          ));
-                        //}
-
-                        // 境界条件
-                        if(vs[5] == "$dirichlet"){
-                            double val = atof(vs[6].c_str());
-                            edges[edges.size()-1]->bc.setBCandVal( COND_DIRICHLET, val );
-                        }else if(vs[5] == "$neumann"){
-                            edges[edges.size()-1]->bc.setBCandVal( COND_NEUMANN, 0 );
-                        }
-
-                        // 表面の材料
-                        if(vs[7] == "$Cu" || vs[7] == "$none"){
-                            edges[edges.size()-1]->material.setMaterial( vs[7].c_str() );
-                            cout << vs[7].c_str() << endl;
-                        }
+                        Edge* new_edge = createNewEdgeFromVs( vs, scale, nodes );
+                        edges.push_back( new_edge );
                     }
-             }
+            }
         }
     }
 
@@ -157,4 +130,47 @@ static vector<string> parseStringLine( char* line )
 			vs.push_back( (string) minibuff );
 
 	return vs;
+}
+
+static Node* createNewNodeFromVs( const vector<string>& vs, double scale )
+{
+    double px = scale * atof( vs[1].c_str() );
+    double py = scale * atof( vs[2].c_str() );
+    return ( new Node( px, py ) );
+}
+
+static Edge* createNewEdgeFromVs( const vector<string>& vs, double scale, const vector<Node*>& nodes)
+{
+    Edge* new_edge;
+
+    // 線の種類
+    if(vs[3] == "$str"){
+        Node* node1 = nodes[ atoi( vs[1].c_str() )-1 ];
+        Node* node2 = nodes[ atoi( vs[2].c_str() )-1 ];
+        new_edge = new StraightEdge( node1, node2 ) ;
+    }
+
+    //else if(vs[3] == "$cir"){
+    //    parseStrWithComma( vs[4],varg );
+    //    edge.push_back( new CircleEdge( node[atoi(vs[1].c_str())-1],
+    //                node[atoi(vs[2].c_str())-1], 
+    //                scale * atof(varg[1].c_str()),
+    //                scale * atof(varg[2].c_str()),
+    //                atof(varg[3].c_str())          ));
+    //}
+
+    // 境界条件
+    if(vs[5] == "$dirichlet"){
+        double val = atof(vs[6].c_str());
+        new_edge->bc.setBCandVal( COND_DIRICHLET, val );
+    }else if(vs[5] == "$neumann"){
+        new_edge->bc.setBCandVal( COND_NEUMANN, 0 );
+    }
+
+    // 表面の材料
+    if(vs[7] == "$Cu" || vs[7] == "$none"){
+        new_edge->material.setMaterial( vs[7].c_str() );
+    }
+
+    return new_edge;
 }
