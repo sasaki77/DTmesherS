@@ -114,9 +114,9 @@ bool DT::inputParam()
                         // 境界条件
                         if(vs[5] == "$dirichlet"){
                             double val = atof(vs[6].c_str());
-                            edges[edges.size()-1]->setBC( COND_DIRICHLET, val );
+                            edges[edges.size()-1]->bc.setBCandVal( COND_DIRICHLET, val );
                         }else if(vs[5] == "$neumann"){
-                            edges[edges.size()-1]->setBC( COND_NEUMANN, 0 );
+                            edges[edges.size()-1]->bc.setBCandVal( COND_NEUMANN, 0 );
                         }
                     }
              }

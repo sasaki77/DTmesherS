@@ -9,9 +9,10 @@ class Edge
 {
 	protected:
 		Node *p[2];
-        BoundaryCondition bc;
 
 	public:
+        BoundaryCondition bc;
+
 		Edge(){
 			p[0] = NULL;
 			p[1] = NULL;
@@ -26,18 +27,6 @@ class Edge
 			p[0] = _p0;
 			p[1] = _p1;
 		}
-
-        void setBC( BOUNDARY_COND _bc, double _val ){
-            bc.setBCandVal( _bc, _val );
-        }
-
-        BOUNDARY_COND getBC(){
-            bc.getBC();
-        }
-
-        double getBCVal(){
-            bc.getVal();
-        }
 
 		virtual double getLength() = 0;
 		//virtual Point  divPoint(int n,int i) = 0;
