@@ -14,6 +14,7 @@ bool DT::startDT() {
 
 	for (int i = 0; i < edges.size(); i++) {
 		cout << i << ":length = "  << edges[i]->getLength() << ", bc = " << edges[i]->bc.getBC() << "," << edges[i]->bc.getVal()  << endl;
+		cout << "material = " << edges[i]->material.getMaterial() << endl;
 	}
 
 	return true;

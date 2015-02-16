@@ -4,6 +4,7 @@
 #include <cmath>
 #include "point.h"
 #include "bc.h"
+#include "material.h"
 
 class Edge
 {
@@ -12,6 +13,7 @@ class Edge
 
 	public:
         BoundaryCondition bc;
+        Material          material;
 
 		Edge(){
 			p[0] = NULL;

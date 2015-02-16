@@ -118,6 +118,12 @@ bool DT::inputParam()
                         }else if(vs[5] == "$neumann"){
                             edges[edges.size()-1]->bc.setBCandVal( COND_NEUMANN, 0 );
                         }
+
+                        // 表面の材料
+                        if(vs[7] == "$Cu" || vs[7] == "$none"){
+                            edges[edges.size()-1]->material.setMaterial( vs[7].c_str() );
+                            cout << vs[7].c_str() << endl;
+                        }
                     }
              }
         }
