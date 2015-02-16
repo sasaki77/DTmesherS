@@ -3,6 +3,8 @@
 
 #include <cmath>
 #include "point.h"
+#include "bc.h"
+#include "material.h"
 
 class Edge
 {
@@ -10,6 +12,9 @@ class Edge
 		Node *p[2];
 
 	public:
+        BoundaryCondition bc;
+        Material          material;
+
 		Edge(){
 			p[0] = NULL;
 			p[1] = NULL;
