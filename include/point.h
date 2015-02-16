@@ -15,6 +15,14 @@ class Point
 			y = _y;
 		}
 
+        void setX( double _x ){
+            x = _x;
+        }
+
+        void setY( double _y ){
+            y = _y;
+        }
+
 		double getX(){
 			return x;
 		}
