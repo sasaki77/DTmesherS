@@ -55,4 +55,9 @@ class Node: public Point
 		}
 };
 
+class SuperNode: public Node{
+    public:
+        SuperNode( double _x,double _y ):Node( _x,_y ){}
+};
+
 #endif /* end of include guard */
