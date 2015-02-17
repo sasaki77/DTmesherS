@@ -6,6 +6,7 @@
 
 #include "point.h"
 #include "edge.h"
+#include "triangle.h"
 
 using namespace std;
 
@@ -28,10 +29,12 @@ class DT {
 
 		vector< Node* >     nodes;
         vector< Edge* >     edges;
+        vector< Triangle* > triangles;
 
 		bool inputParam();
         void nodesNormalize();      // nodesNormalize()で全ての節点を0<=x<=1,0<=y<=1に規格化する
         void nodesDenormalize();
+        void setSuperTriangle();
 };
 
 #endif /* end of include guard */

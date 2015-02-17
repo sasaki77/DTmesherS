@@ -31,6 +31,15 @@ bool DT::startDT()
 		cout << i << ":(" << nodes[i]->getX() << "," << nodes[i]->getY() << ")" << endl;
 	}
 
+    setSuperTriangle();
+    for (int i=0; i < triangles.size(); i++) {
+        for( int j=0; j<3; j++ ){
+            Node* p = triangles[i]->getNode(j);
+            cout << "p" << j << " = (" << p->getNum() << "," << p->getX() << "," << p->getY() << ")" << endl;
+        }
+        cout << "exist: " << triangles[i]->getExist() << endl;
+    }
+
 	return true;
 }
 
@@ -86,4 +95,20 @@ void DT::nodesDenormalize()
     //        c->r        *= square;
     //    }
     //}
+}
+
+void DT::setSuperTriangle()
+{
+    Node *p1 = new SuperNode( -1.23, -0.50 );
+    Node *p2 = new SuperNode(  2.23, -0.50 );
+    Node *p3 = new SuperNode(  0.50,  2.50 );
+
+    nodes.push_back( p1 );
+    nodes.push_back( p2 );
+    nodes.push_back( p3 );
+
+    Triangle *t = new Triangle();
+    t->setNodes( p1, p2, p3 );
+    t->setExist( true );
+    triangles.push_back( t );
 }
