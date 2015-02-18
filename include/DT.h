@@ -15,6 +15,21 @@ class DT {
 		DT(){
 		}
 
+        ~DT(){
+            for( unsigned int i=0; i<nodes.size(); i++ ){
+                if(nodes[i] != NULL) delete nodes[i];
+            }
+            for( unsigned int i=0; i<triangles.size(); i++ ){
+                if(triangles[i] != NULL) delete triangles[i];
+            }
+            for( unsigned int i=0; i<edges.size(); i++ ){
+                if(edges[i] != NULL) delete edges[i];
+            }
+            //for( unsigned int i=0; i<bnd.size(); i++ ){
+            //    if(bnd[i] != NULL) delete bnd[i];
+            //}
+        }
+
 		bool startDT();
 		void setInputFile(string _infile){ 
 			infile_name = _infile;
