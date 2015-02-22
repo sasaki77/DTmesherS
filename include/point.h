@@ -53,6 +53,10 @@ class Node: public Point
 		unsigned int getNum(){
 			return number;
 		}
+
+		void setNum( unsigned int _num){
+            number = _num;
+		}
 };
 
 class SuperNode: public Node{
