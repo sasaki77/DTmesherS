@@ -7,7 +7,9 @@
 
 #include "DT.h"
 
-#define BUFF_SIZE 1024
+#define BUFF_SIZE (1024)
+
+#define OUT_EPS (1e-14)
 
 enum READ_STATE{
 	STATE_DEFAULT,
@@ -103,6 +105,98 @@ bool DT::inputParam()
     }
 
 	return true;
+}
+
+bool DT::outputResult()
+{
+    // 節点要素関係ファイル
+    ofstream ofs_elem( ( outfile_name + ".elem" ).c_str() );
+
+    ofs_elem << form << endl;
+
+    // 全節点数の算出
+    int nodenum = 0;
+    for( unsigned int i=0; i<nodes.size(); i++ )
+        if( typeid(*nodes[i]) == typeid(Node) ) nodenum++;
+
+    // 全要素数
+    int elem_num = 0;
+    for( unsigned int i=0; i<triangles.size(); i++ )
+        if( triangles[i]->getExist() ) elem_num++;
+
+    ofs_elem << nodenum  << endl;
+    ofs_elem << elem_num << endl;
+
+    // 節点情報の出力
+    int supernode_num = 0;
+    for( unsigned int i=0; i<nodes.size(); i++ ){
+        if( typeid(*nodes[i]) == typeid(SuperNode) ){
+            supernode_num++;
+            continue;
+        }
+
+        nodes[i]->setNum( nodes[i]->getNum() - supernode_num );
+        ofs_elem << nodes[i]->getNum() << ' ';
+
+        if( fabs(nodes[i]->getX() ) < OUT_EPS ) {
+            ofs_elem << 0 << ' ';
+        }else{
+            ofs_elem << nodes[i]->getX() << ' ';
+        }
+
+        if( fabs(nodes[i]->getY() ) < OUT_EPS ){
+            ofs_elem << 0 << endl;
+        }else{
+            ofs_elem << nodes[i]->getY() << endl;
+        }
+    }
+
+    // 要素情報の出力
+    int tn = 0;
+    for(unsigned int i=0; i<triangles.size(); i++){
+        if( triangles[i]->getExist() ){
+            tn++;
+            ofs_elem << tn << ' ' << triangles[i]->getNode( 0 )->getNum()
+                           << ' ' << triangles[i]->getNode( 1 )->getNum()
+                           << ' ' << triangles[i]->getNode( 2 )->getNum() << endl;
+        }
+    }
+
+    ofstream ofs_bc((outfile_name+".bc").c_str());
+
+    // 境界条件ファイル
+    ofs_bc << "$begin_bc" << endl;
+    //for( unsigned int i=0; i<edges.size(); i++){
+    //    if( edges[i]->bc.getBC() != COND_NEUMANN ){
+    //        edges[i]->p[0]->bc  = edges[i]->p[1]->bc  = edges[i]->bc;
+    //        edges[i]->p[0]->val = edges[i]->p[1]->val = edges[i]->val;
+    //    }
+    //}
+
+    //for(unsigned int i=0; i<nodes.size(); i++)
+    //    if(nodes[i]->bc == 1)
+    //        ofs_bc << nodes[i]->number << " " << nodes[i]->val << endl;
+    ofs_bc << "$end" << endl << endl;
+
+    // 材料ファイル
+    //vector< StraightEdge > surf;
+    //for( unsigned int i=0; i<edges.size(); i++ ){
+    //    if( edges[i]->material.getMaterial() != "" && edges[i]->material.getMaterial() != "$none" ){
+    //        StraightEdge e( edges[i]->p[0], edges[i]->p[1] );
+    //        e.material = edges[i]->material.getMaterial();
+    //        surf.push_back(e);
+    //    }
+    //}
+
+    ofs_bc << "$begin_material" << endl;
+    //ofs_bc << surf.size()       << endl;
+
+    //for(unsigned int i=0;i<surf.size();i++){
+    //    ofs_bc << surf[i].p[0]->number << " "
+    //        << surf[i].p[1]->number << " " 
+    //        << surf[i].material << endl;
+    //}
+    ofs_bc << "$end" << endl;
 }
 
 static bool isCommentLine( char* line )

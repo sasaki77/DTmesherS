@@ -40,6 +40,8 @@ bool DT::startDT()
         cout << "exist: " << triangles[i]->getExist() << endl;
     }
 
+    outputResult();
+
 	return true;
 }
 
