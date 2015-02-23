@@ -40,6 +40,8 @@ bool DT::startDT()
         cout << "exist: " << triangles[i]->getExist() << endl;
     }
 
+    removeIllegalTriangles();
+
     outputResult();
 
 	return true;
@@ -113,4 +115,23 @@ void DT::setSuperTriangle()
     t->setNodes( p1, p2, p3 );
     t->setExist( true );
     triangles.push_back( t );
+}
+
+void DT::removeIllegalTriangles()
+{
+    Triangle *triangle;
+
+    for( unsigned int i=0; i<triangles.size(); i++ ){
+        triangle = triangles[i];
+        triangle->setExist( true );
+
+        // 仮想三角形の頂点に接する三角形は除去
+        if( typeid( *( triangle->getNode(0) ) ) == typeid(SuperNode) ||
+            typeid( *( triangle->getNode(1) ) ) == typeid(SuperNode) ||
+            typeid( *( triangle->getNode(2) ) ) == typeid(SuperNode) 
+          ){
+            triangle->setExist( false );
+            continue;
+        }
+    }
 }

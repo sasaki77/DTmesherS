@@ -57,6 +57,7 @@ class DT {
         void nodesNormalize();      // nodesNormalize()で全ての節点を0<=x<=1,0<=y<=1に規格化する
         void nodesDenormalize();
         void setSuperTriangle();
+        void removeIllegalTriangles();
 };
 
 #endif /* end of include guard */
