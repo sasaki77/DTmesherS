@@ -10,6 +10,8 @@ class Point
 		Point():x(0),y(0){}
 		Point( double _x, double _y ):x(_x),y(_y){}
 
+        virtual ~Point () {}
+
 		void set(double _x, double _y){
 			x = _x;
 			y = _y;
@@ -50,6 +52,8 @@ class Node: public Point
 			val    = 0;
 		}
 
+        virtual ~Node() {}
+
 		unsigned int getNum(){
 			return number;
 		}
@@ -62,6 +66,7 @@ class Node: public Point
 class SuperNode: public Node{
     public:
         SuperNode( double _x,double _y ):Node( _x,_y ){}
+        virtual ~SuperNode () {}
 };
 
 #endif /* end of include guard */
