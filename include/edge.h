@@ -25,6 +25,8 @@ class Edge
 			p[1] = _p1;
 		}
 
+        virtual ~Edge () {}
+
 		void setNodes( Node *_p0, Node *_p1 ){
 			p[0] = _p0;
 			p[1] = _p1;
@@ -47,6 +49,8 @@ class StraightEdge: public Edge{
 		StraightEdge():Edge(){}
 
 		StraightEdge( Node *_p0, Node *_p1 ):Edge(_p0,_p1){}
+
+        virtual ~StraightEdge () {}
 
 		double getLength(){
 			double dx = fabs(p[1]->getX() - p[0]->getX() );

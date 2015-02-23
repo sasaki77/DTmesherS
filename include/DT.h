@@ -31,8 +31,13 @@ class DT {
         }
 
 		bool startDT();
+
 		void setInputFile(string _infile){ 
 			infile_name = _infile;
+		};
+
+		void setOutputFile(string _outfile){ 
+			outfile_name = _outfile;
 		};
 
 	private:
@@ -40,13 +45,15 @@ class DT {
         double max_distance;
 		string infile_name;
 		string outfile_name;
-		int form;
+		int    form;
 
 		vector< Node* >     nodes;
         vector< Edge* >     edges;
         vector< Triangle* > triangles;
 
 		bool inputParam();
+		bool outputResult();
+
         void nodesNormalize();      // nodesNormalize()で全ての節点を0<=x<=1,0<=y<=1に規格化する
         void nodesDenormalize();
         void setSuperTriangle();
