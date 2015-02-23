@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <list>
+#include <typeinfo>
 
 #include "DT.h"
 
