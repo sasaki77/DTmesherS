@@ -126,9 +126,9 @@ void DT::removeIllegalTriangles()
         triangle->setExist( true );
 
         // 仮想三角形の頂点に接する三角形は除去
-        if( typeid( *( triangle->getNode(0) ) ) == typeid(SuperNode) ||
-            typeid( *( triangle->getNode(1) ) ) == typeid(SuperNode) ||
-            typeid( *( triangle->getNode(2) ) ) == typeid(SuperNode) 
+        if( triangle->getNode(0)->isSuperNode() ||
+            triangle->getNode(1)->isSuperNode() ||
+            triangle->getNode(2)->isSuperNode() 
           ){
             triangle->setExist( false );
             continue;

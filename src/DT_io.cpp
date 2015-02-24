@@ -4,7 +4,6 @@
 #include <sstream>
 #include <vector>
 #include <list>
-#include <typeinfo>
 
 #include "DT.h"
 
@@ -118,7 +117,7 @@ bool DT::outputResult()
     // 全節点数の算出
     int nodenum = 0;
     for( unsigned int i=0; i<nodes.size(); i++ )
-        if( typeid(*nodes[i]) == typeid(Node) ) nodenum++;
+        if( !nodes[i]->isSuperNode() ) nodenum++;
 
     // 全要素数
     int elem_num = 0;
@@ -131,7 +130,7 @@ bool DT::outputResult()
     // 節点情報の出力
     int supernode_num = 0;
     for( unsigned int i=0; i<nodes.size(); i++ ){
-        if( typeid(*nodes[i]) == typeid(SuperNode) ){
+        if( nodes[i]->isSuperNode() ){
             supernode_num++;
             continue;
         }
