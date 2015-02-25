@@ -25,7 +25,6 @@ bool DT::startDT()
 		cout << i << ":(" << nodes[i]->getX() << "," << nodes[i]->getY() << ")" << endl;
 	}
 
-    nodesDenormalize();
 
 	for (int i = 0; i < nodes.size(); i++) {
 		cout << i << ":(" << nodes[i]->getX() << "," << nodes[i]->getY() << ")" << endl;
@@ -39,6 +38,20 @@ bool DT::startDT()
         }
         cout << "exist: " << triangles[i]->getExist() << endl;
     }
+
+    Node* new_node = new Node( 0.2, 0.2 );
+    nodes.push_back( new_node );
+    vector<Triangle*> t = divideTriInto3( triangles[0], new_node );
+
+    for (int i=0; i < t.size(); i++) {
+        for( int j=0; j<3; j++ ){
+            Node* p = triangles[i]->getNode(j);
+            cout << "p" << j << " = (" << p->getNum() << "," << p->getX() << "," << p->getY() << ")" << endl;
+        }
+        cout << "exist: " << triangles[i]->getExist() << endl;
+    }
+
+    nodesDenormalize();
 
     removeIllegalTriangles();
 
@@ -134,4 +147,38 @@ void DT::removeIllegalTriangles()
             continue;
         }
     }
+}
+
+vector<Triangle*> DT::divideTriInto3( Triangle* triBase, Node* node )
+{
+    Triangle temp_tri = *triBase;
+
+    vector<Triangle*> t;
+    t.push_back( triBase );
+    t.push_back( new Triangle() );
+    t.push_back( new Triangle() );
+
+    t[0]->setNodes( temp_tri.getNode(0), temp_tri.getNode(1), node );
+    t[1]->setNodes( temp_tri.getNode(1), temp_tri.getNode(2), node );
+    t[2]->setNodes( temp_tri.getNode(2), temp_tri.getNode(0), node );
+
+    t[0]->setNeighborTri( temp_tri.getNeighborTri(0), t[1], t[2] );
+    t[1]->setNeighborTri( temp_tri.getNeighborTri(1), t[2], t[0] );
+    t[2]->setNeighborTri( temp_tri.getNeighborTri(2), t[0], t[1] );
+
+    // 外部の三角形と小三角形の関係の更新
+    for( int i=0; i<3; i++ ){
+        if( t[i]->getNeighborTri(0) == NULL ) continue;
+
+        for( int j=0; j<3; j++ ){
+            if( t[i]->getNeighborTri(0)->getNeighborTri(j) == triBase ){
+                t[i]->getNeighborTri(0)->setNeighborTriOne( j, t[i] );
+            }
+        }
+    }
+
+    triangles.push_back( t[1] );
+    triangles.push_back( t[2] );
+
+    return t;
 }

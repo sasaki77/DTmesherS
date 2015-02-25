@@ -58,6 +58,8 @@ class DT {
         void nodesDenormalize();
         void setSuperTriangle();
         void removeIllegalTriangles();
+
+        vector<Triangle*> divideTriInto3( Triangle*, Node* );
 };
 
 #endif /* end of include guard */

@@ -25,6 +25,7 @@ class Triangle {
         void      setNodes( Node*, Node*, Node* );
         void      setExist( bool );
         void      setNeighborTri( Triangle*, Triangle*, Triangle* );
+        void      setNeighborTriOne( int, Triangle* );
         Node*     getNode( unsigned int );
         bool      getExist();
         Triangle* getNeighborTri( int );

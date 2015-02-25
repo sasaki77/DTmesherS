@@ -22,6 +22,16 @@ void  Triangle::setNeighborTri( Triangle* nei1, Triangle* nei2, Triangle* nei3 )
     neighbor_triangle[2] = nei3;
 }
 
+void  Triangle::setNeighborTriOne( int index, Triangle* nei )
+{
+    if( index < 0 || index > 2 ){
+        cout << "setNeighborTriOne() index must be from 0 to 2" << endl;
+        return;
+    }
+
+    neighbor_triangle[0] = nei;
+}
+
 Node* Triangle::getNode( unsigned int index )
 {
     if( index < 0 || index > 2 ){
