@@ -12,6 +12,8 @@ using namespace std;
 
 class DT {
 	public:
+		static const double kCalcEps = 1e-14;
+		static const double kOutEps  = 1e-15;
 		DT(){
 		}
 
@@ -60,6 +62,7 @@ class DT {
         void removeIllegalTriangles();
 
         vector<Triangle*> divideTriInto3( Triangle*, Node* );
+		Triangle* searchTriangle( Triangle*, Node* );
 };
 
 #endif /* end of include guard */

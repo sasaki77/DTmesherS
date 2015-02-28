@@ -1,8 +1,13 @@
+#include <stdio.h>
+#include <time.h>
 #include <iostream>
 #include <cfloat>
 #include "DT.h"
 
 using namespace std;
+
+static double getDet( double,double ,double ,double ,double ,double );
+static double isSamePoint( Point*, Point* );
 
 bool DT::startDT() 
 {
@@ -40,6 +45,8 @@ bool DT::startDT()
     }
 
     Node* new_node = new Node( 0.2, 0.2 );
+	Triangle *temp_tri = searchTriangle( triangles[0], new_node );
+
     nodes.push_back( new_node );
     vector<Triangle*> t = divideTriInto3( triangles[0], new_node );
 
@@ -50,6 +57,9 @@ bool DT::startDT()
         }
         cout << "exist: " << triangles[i]->getExist() << endl;
     }
+
+    new_node = new Node( 0.3, 0.3 );
+	temp_tri = searchTriangle( triangles[0], new_node );
 
     nodesDenormalize();
 
@@ -181,4 +191,71 @@ vector<Triangle*> DT::divideTriInto3( Triangle* triBase, Node* node )
     triangles.push_back( t[2] );
 
     return t;
+}
+
+
+Triangle* DT::searchTriangle( Triangle* tBase, Node* node )
+{
+	double det;
+	double _x = node->getX(), _y = node->getY();
+	double dx,dy;
+
+	srand((unsigned)time(NULL));
+
+	for( int i=0; i<3; i++ ){
+		det = getDet(_x,_y,
+				     tBase->getNode(i)->getX(), tBase->getNode(i)->getY(),
+				     tBase->getNode( (i+1)%3 )->getX(), tBase->getNode( (i+1)%3 )->getY() );
+
+		// 二点の座標が同じ->三角形として矛盾，終了する
+		if( isSamePoint( tBase->getNode(i), tBase->getNode((i+1)%3) ) ){
+			//cout << "tBase = "   << *tBase      << endl;
+			//cout << " tBase->p[" << i << "] = " << endl << *(tBase->p[i]) << endl;
+			//cout << " tBase->p[" << (i+1)%3 << "] = " << endl << *(tBase->p[(i+1)%3]) << endl;
+			//dt->disp();
+			exit(EXIT_FAILURE);
+		}
+
+		if( fabs(det) < kCalcEps ){
+			// 直線上に節点が存在する時
+			// 節点をわずかに移動させる
+			dx  = kOutEps * (rand()%10+1);
+			dy  = kOutEps * (rand()%10+1);
+			_x -= 10*kOutEps/2;
+			_x += dx;
+			_y -= 10*kOutEps/2;
+			_y += dy;
+			i--;
+			continue;
+		}else if( det < 0 ){
+			// 設置点が辺の右側にあれば移動
+			tBase = tBase->getNeighborTri(i);
+			i = -1;
+		}
+	}
+
+	//cout << "searchTriangle:" << endl;
+	//for( int j=0; j<3; j++ ){
+	//	Node* p = tBase->getNode(j);
+	//	cout << "p" << j << " = (" << p->getNum() << "," << p->getX() << "," << p->getY() << ")" << endl;
+	//}
+	//cout << "end searchTriangle:" << endl;
+	return tBase;
+}
+
+static double getDet( double x0,double y0,double x1,double y1,double x2,double y2 )
+{
+  return ((x1-x0)*(y2-y0) - (y1-y0)*(x2-x0));
+}
+
+static double isSamePoint( Point* p1, Point* p2 )
+{
+	double dx = fabs( fabs( p1->getX() ) - fabs( p2->getX() ) );
+	double dy = fabs( fabs( p1->getY() ) - fabs( p2->getY() ) );
+
+	if( dx < DT::kCalcEps && dy < DT::kCalcEps ){
+		return true;
+	}
+
+	return false;
 }
