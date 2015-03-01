@@ -36,6 +36,25 @@ bool DT::startDT()
 	}
 
     setSuperTriangle();
+
+    //Node* new_node = new Node( 0.2, 0.2 );
+	//Triangle *temp_tri = searchTriangle( triangles[0], new_node );
+
+    //nodes.push_back( new_node );
+    //vector<Triangle*> t = divideTriInto3( triangles[0], new_node );
+
+    //for (int i=0; i < t.size(); i++) {
+    //    for( int j=0; j<3; j++ ){
+    //        Node* p = triangles[i]->getNode(j);
+    //        cout << "p" << j << " = (" << p->getNum() << "," << p->getX() << "," << p->getY() << ")" << endl;
+    //    }
+    //    cout << "exist: " << triangles[i]->getExist() << endl;
+    //}
+
+	generateBoundary();
+	for (int i = 0; i < nodes.size(); i++) {
+		cout << i << ":(" << nodes[i]->getX() << "," << nodes[i]->getY() << ")" << endl;
+	}
     for (int i=0; i < triangles.size(); i++) {
         for( int j=0; j<3; j++ ){
             Node* p = triangles[i]->getNode(j);
@@ -44,22 +63,8 @@ bool DT::startDT()
         cout << "exist: " << triangles[i]->getExist() << endl;
     }
 
-    Node* new_node = new Node( 0.2, 0.2 );
-	Triangle *temp_tri = searchTriangle( triangles[0], new_node );
-
-    nodes.push_back( new_node );
-    vector<Triangle*> t = divideTriInto3( triangles[0], new_node );
-
-    for (int i=0; i < t.size(); i++) {
-        for( int j=0; j<3; j++ ){
-            Node* p = triangles[i]->getNode(j);
-            cout << "p" << j << " = (" << p->getNum() << "," << p->getX() << "," << p->getY() << ")" << endl;
-        }
-        cout << "exist: " << triangles[i]->getExist() << endl;
-    }
-
-    new_node = new Node( 0.3, 0.3 );
-	temp_tri = searchTriangle( triangles[0], new_node );
+    //new_node = new Node( 0.3, 0.3 );
+	//temp_tri = searchTriangle( triangles[0], new_node );
 
     nodesDenormalize();
 
@@ -140,6 +145,19 @@ void DT::setSuperTriangle()
     triangles.push_back( t );
 }
 
+void DT::generateBoundary()
+{
+	Triangle* tBase = triangles[0];
+
+	for( int i=0; i<nodes.size(); i++ ){
+		if( nodes[i]->isSuperNode() )
+			continue;
+
+		tBase = searchTriangle(tBase,nodes[i]);
+		divideTriInto3(tBase,nodes[i]);
+	}
+}
+
 void DT::removeIllegalTriangles()
 {
     Triangle *triangle;
@@ -186,6 +204,11 @@ vector<Triangle*> DT::divideTriInto3( Triangle* triBase, Node* node )
             }
         }
     }
+
+	bool is_exist = temp_tri.getExist();
+	for( int i=0; i<3; i++ ){
+		t[i]->setExist( is_exist );
+	}
 
     triangles.push_back( t[1] );
     triangles.push_back( t[2] );
