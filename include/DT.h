@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 
 #include "point.h"
 #include "edge.h"
@@ -62,8 +63,10 @@ class DT {
 		void generateBoundary();
         void removeIllegalTriangles();
 
-        vector<Triangle*> divideTriInto3( Triangle*, Node* );
-		Triangle* searchTriangle( Triangle*, Node* );
+        vector<Triangle*>   divideTriInto3( Triangle*, Node* );
+		Triangle*           searchTriangle( Triangle*, Node* );
+		void 			    swapTriangles( Triangle*, Triangle*, int, int );
+		vector< Triangle* > swappingAlg( stack< Triangle* >*, Node* );
 };
 
 #endif /* end of include guard */

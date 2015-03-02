@@ -32,15 +32,19 @@ class Edge
 			p[1] = _p1;
 		}
 
+		Node* getNode( int index ){
+			if( index < 0 || index > 1 ){
+				return NULL;
+			}
+			return p[index];
+		}
+
 		virtual double getLength() = 0;
 		//virtual Point  divPoint(int n,int i) = 0;
 
-		bool operator==( const Edge& obj ){
-			return ( (p[0] == obj.p[0] && p[1] == obj.p[1]) || (p[0] == obj.p[1] && p[1] == obj.p[0]) );
-		}
-
-		bool operator!=( const Edge& obj ){
-			return ( !((p[0] == obj.p[0] && p[1] == obj.p[1]) || (p[0] == obj.p[1] && p[1] == obj.p[0])) );
+		bool isEqual( const Edge& _edge ){
+			return ( (p[0]->isEqual(*(_edge.p[0])) && p[1]->isEqual( *(_edge.p[1]) ) ) || 
+					 (p[0]->isEqual(*(_edge.p[1])) && p[1]->isEqual( *(_edge.p[0]) ) ) );
 		}
 };
 

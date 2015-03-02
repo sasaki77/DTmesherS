@@ -9,8 +9,6 @@
 
 #define BUFF_SIZE (1024)
 
-#define OUT_EPS (1e-14)
-
 enum READ_STATE{
 	STATE_DEFAULT,
 	STATE_PARAMS,
@@ -138,13 +136,13 @@ bool DT::outputResult()
         nodes[i]->setNum( nodes[i]->getNum() - supernode_num );
         ofs_elem << nodes[i]->getNum() << ' ';
 
-        if( fabs(nodes[i]->getX() ) < OUT_EPS ) {
+        if( fabs(nodes[i]->getX() ) < DT::kOutEps ) {
             ofs_elem << 0 << ' ';
         }else{
             ofs_elem << nodes[i]->getX() << ' ';
         }
 
-        if( fabs(nodes[i]->getY() ) < OUT_EPS ){
+        if( fabs(nodes[i]->getY() ) < DT::kOutEps ){
             ofs_elem << 0 << endl;
         }else{
             ofs_elem << nodes[i]->getY() << endl;

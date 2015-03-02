@@ -62,6 +62,10 @@ class Node: public Point
             number = _num;
 		}
 
+		bool isEqual( const Node& _node ){
+			return (number == _node.number );
+		}
+
         virtual bool isSuperNode(){
             return false;
         }

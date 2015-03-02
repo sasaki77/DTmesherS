@@ -1,3 +1,3 @@
 #include "point.h"
 
-unsigned int Node::num_node = 0;
+unsigned int Node::num_node = 1;

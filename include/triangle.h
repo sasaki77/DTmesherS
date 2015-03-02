@@ -1,7 +1,6 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-#include <iostream>
 #include "point.h"
 
 using namespace std;

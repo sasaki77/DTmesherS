@@ -29,7 +29,7 @@ void  Triangle::setNeighborTriOne( int index, Triangle* nei )
         return;
     }
 
-    neighbor_triangle[0] = nei;
+    neighbor_triangle[index] = nei;
 }
 
 Node* Triangle::getNode( unsigned int index )
