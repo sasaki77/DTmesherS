@@ -4,13 +4,10 @@
 #include <sstream>
 #include <vector>
 #include <list>
-#include <typeinfo>
 
 #include "DT.h"
 
 #define BUFF_SIZE (1024)
-
-#define OUT_EPS (1e-14)
 
 enum READ_STATE{
 	STATE_DEFAULT,
@@ -118,7 +115,7 @@ bool DT::outputResult()
     // 全節点数の算出
     int nodenum = 0;
     for( unsigned int i=0; i<nodes.size(); i++ )
-        if( typeid(*nodes[i]) == typeid(Node) ) nodenum++;
+        if( !nodes[i]->isSuperNode() ) nodenum++;
 
     // 全要素数
     int elem_num = 0;
@@ -131,7 +128,7 @@ bool DT::outputResult()
     // 節点情報の出力
     int supernode_num = 0;
     for( unsigned int i=0; i<nodes.size(); i++ ){
-        if( typeid(*nodes[i]) == typeid(SuperNode) ){
+        if( nodes[i]->isSuperNode() ){
             supernode_num++;
             continue;
         }
@@ -139,13 +136,13 @@ bool DT::outputResult()
         nodes[i]->setNum( nodes[i]->getNum() - supernode_num );
         ofs_elem << nodes[i]->getNum() << ' ';
 
-        if( fabs(nodes[i]->getX() ) < OUT_EPS ) {
+        if( fabs(nodes[i]->getX() ) < DT::kOutEps ) {
             ofs_elem << 0 << ' ';
         }else{
             ofs_elem << nodes[i]->getX() << ' ';
         }
 
-        if( fabs(nodes[i]->getY() ) < OUT_EPS ){
+        if( fabs(nodes[i]->getY() ) < DT::kOutEps ){
             ofs_elem << 0 << endl;
         }else{
             ofs_elem << nodes[i]->getY() << endl;

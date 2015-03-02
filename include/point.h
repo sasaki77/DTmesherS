@@ -61,12 +61,24 @@ class Node: public Point
 		void setNum( unsigned int _num){
             number = _num;
 		}
+
+		bool isEqual( const Node& _node ){
+			return (number == _node.number );
+		}
+
+        virtual bool isSuperNode(){
+            return false;
+        }
 };
 
 class SuperNode: public Node{
     public:
         SuperNode( double _x,double _y ):Node( _x,_y ){}
         virtual ~SuperNode () {}
+
+        bool isSuperNode(){
+            return true;
+        }
 };
 
 #endif /* end of include guard */
