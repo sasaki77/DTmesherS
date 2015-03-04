@@ -5,9 +5,11 @@
 
 class AddNodeOblateness :public AddNodeInterface{
 	public:
-		AddNodeOblateness() {};
+		AddNodeOblateness(); 
 		virtual ~AddNodeOblateness() {};
 		virtual Node* getAdditionalNode();
+	private:
+		vector< Triangle* > oblOrderTriangles;
 };
 
 #endif /* end of include guard */
