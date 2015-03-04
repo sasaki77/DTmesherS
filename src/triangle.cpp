@@ -60,6 +60,14 @@ void Triangle::calcOblateness()
 	oblateness = max_theta;
 }
 
+void Triangle::calcArea()
+{
+    // 外積により面積を計算
+    Point A( p[2]->getX() - p[0]->getX(), p[2]->getY() - p[0]->getY() );
+    Point B( p[1]->getX() - p[0]->getX(), p[1]->getY() - p[0]->getY() );
+    area = 0.5*fabs(A.getX()*B.getY() - A.getY()*B.getX());
+}
+
 Node* Triangle::getNode( unsigned int index )
 {
     if( index < 0 || index > 2 ){
