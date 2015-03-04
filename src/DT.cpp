@@ -9,6 +9,11 @@
 
 using namespace std;
 
+// static private member
+vector< Node* >     DT::nodes;
+vector< Edge* >     DT::edges;
+vector< Triangle* > DT::triangles;
+
 static double getDet( double,double ,double ,double ,double ,double );
 static double isSamePoint( Point*, Point* );
 static bool isCrossed( StraightEdge e1, StraightEdge e2 );
