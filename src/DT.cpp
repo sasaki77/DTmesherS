@@ -6,12 +6,18 @@
 #include <cmath>
 
 #include "DT.h"
+#include "add_node_oblateness.h"
 
 using namespace std;
 
+// static private member
+vector< Node* >     DT::nodes;
+vector< Edge* >     DT::edges;
+vector< Triangle* > DT::triangles;
+
 static double getDet( double,double ,double ,double ,double ,double );
 static double isSamePoint( Point*, Point* );
-static bool isCrossed( StraightEdge e1, StraightEdge e2 );
+static bool   isCrossed( StraightEdge, StraightEdge);
 
 bool DT::startDT() 
 {
@@ -69,6 +75,11 @@ bool DT::startDT()
         }
         cout << "exist: " << triangles[i]->getExist() << endl;
     }
+
+	cout << "remove illegal triangles start" << endl << endl;
+    removeIllegalTriangles();
+
+	generateFineMesh();
 
     //new_node = new Node( 0.3, 0.3 );
 	//temp_tri = searchTriangle( triangles[0], new_node );
@@ -157,12 +168,12 @@ void DT::setSuperTriangle()
 
 void DT::generateBoundary()
 {
+	cout << "generateBoundary" << endl;
 	Triangle* tBase = triangles[0];
 
 	for( int i=0; i<nodes.size(); i++ ){
 		if( nodes[i]->isSuperNode() )
 			continue;
-		cout << "node:" << nodes[i]->getNum() << endl;
 
 		tBase = searchTriangle(tBase,nodes[i]);
 		vector< Triangle* > t = divideTriInto3(tBase,nodes[i]);
@@ -192,6 +203,59 @@ void DT::removeIllegalTriangles()
             continue;
         }
     }
+}
+
+void DT::generateFineMesh()
+{
+	// 追加節点数の設定
+	int addnum; // 追加節点数
+	cout << " number of additional nodes : " << endl;
+	cout << " >>" << flush ;
+	cin >> addnum;
+
+	for( unsigned int i=0; i<addnum; i++ ){
+		AddNodeInterface *ani = new AddNodeOblateness();
+		Node* new_node = ani->getAdditionalNode();
+
+		Triangle* t = searchTriangle( triangles[0], new_node );
+
+		int p_index = -1;
+		for( int j=0; j<3; j++ ){
+			double det = getDet(new_node->getX(), new_node->getY(),
+					            t->getNode(j)->getX(), t->getNode(j)->getY(),
+					            t->getNode( (j+1)%3 )->getX(), t->getNode( (j+1)%3 )->getY() );
+			if( fabs(det) < kCalcEps ){
+				p_index = j;
+			}
+		}
+
+		vector< Triangle* > tv;
+		if( p_index < 0 ){
+			tv = divideTriInto3( t, new_node );
+		}else{
+            StraightEdge e( t->getNode( p_index ), t->getNode( (p_index+1)%3 ) );
+			for( unsigned int j=0; j<edges.size(); j++ ){
+				if( e.isEqual( *edges[j] ) ){
+					Edge* new_edge = edges[j]->divideInto2( new_node );
+					edges.push_back( new_edge );
+				}
+			}
+			tv = divideTriInto4( t, new_node, p_index );
+			for (int j=0; j < tv.size(); j++) {
+				for( int k=0; k<3; k++ ){
+					Node* p = tv[j]->getNode(k);
+				}
+			}
+		}
+
+		stack< Triangle* > triStack;
+		for(int j=0; j<tv.size(); j++) {
+			triStack.push(tv[j]);
+		}
+		swappingAlg( &triStack, new_node );
+
+		nodes.push_back( new_node );
+	}
 }
 
 vector<Triangle*> DT::divideTriInto3( Triangle* triBase, Node* node )
@@ -233,6 +297,63 @@ vector<Triangle*> DT::divideTriInto3( Triangle* triBase, Node* node )
     return t;
 }
 
+vector<Triangle*> DT::divideTriInto4( Triangle* triBase, Node* node, int index_e )
+{
+    Triangle  temp_base = *triBase;
+	Triangle* triNei    = triBase->getNeighborTri(index_e);
+	Triangle  temp_nei  = *(triNei);
+
+	int index_en;
+	for(int i=0;i<3;i++){
+		if( temp_nei.getNode(i) == temp_base.getNode((index_e+1)%3) ){
+			index_en = i;
+		}
+	}
+
+    vector<Triangle*> t;
+    t.push_back( triBase );
+    t.push_back( new Triangle() );
+    t.push_back( triNei );
+    t.push_back( new Triangle() );
+
+    t[0]->setNodes( temp_base.getNode((index_e+1)%3), temp_base.getNode((index_e+2)%3), node );
+    t[1]->setNodes( temp_base.getNode((index_e+2)%3), temp_base.getNode(index_e),       node );
+    t[2]->setNodes( temp_nei.getNode((index_en+1)%3), temp_nei.getNode((index_en+2)%3), node );
+    t[3]->setNodes( temp_nei.getNode((index_en+2)%3), temp_nei.getNode(index_en),       node );
+
+    t[0]->setNeighborTri( temp_base.getNeighborTri( (index_e+1)%3 ), t[1], t[3] );
+    t[1]->setNeighborTri( temp_base.getNeighborTri( (index_e+2)%3 ), t[2], t[0] );
+    t[2]->setNeighborTri( temp_nei.getNeighborTri( (index_en+1)%3 ), t[3], t[1] );
+    t[3]->setNeighborTri( temp_nei.getNeighborTri( (index_en+2)%3 ), t[0], t[2] );
+
+    // 外部の三角形と小三角形の関係の更新
+    for( int i=0; i<2; i++ ){
+        if( t[i]->getNeighborTri(0) == NULL ) continue;
+
+        for( int j=0; j<3; j++ ){
+            if( t[i]->getNeighborTri(0)->getNeighborTri(j) == triBase ){
+                t[i]->getNeighborTri(0)->setNeighborTriOne( j, t[i] );
+            }
+        }
+    }
+    for( int i=2; i<4; i++ ){
+        if( t[i]->getNeighborTri(0) == NULL ) continue;
+
+        for( int j=0; j<3; j++ ){
+            if( t[i]->getNeighborTri(0)->getNeighborTri(j) == triNei ){
+                t[i]->getNeighborTri(0)->setNeighborTriOne( j, t[i] );
+            }
+        }
+    }
+
+	t[1]->setExist( temp_base.getExist() );
+	t[3]->setExist( temp_nei.getExist() );
+
+    triangles.push_back( t[1] );
+    triangles.push_back( t[3] );
+
+    return t;
+}
 
 Triangle* DT::searchTriangle( Triangle* tBase, Node* node )
 {
@@ -274,12 +395,6 @@ Triangle* DT::searchTriangle( Triangle* tBase, Node* node )
 		}
 	}
 
-	//cout << "searchTriangle:" << endl;
-	//for( int j=0; j<3; j++ ){
-	//	Node* p = tBase->getNode(j);
-	//	cout << "p" << j << " = (" << p->getNum() << "," << p->getX() << "," << p->getY() << ")" << endl;
-	//}
-	//cout << "end searchTriangle:" << endl;
 	return tBase;
 }
 

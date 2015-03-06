@@ -15,6 +15,7 @@ class DT {
 	public:
 		static const double kCalcEps = 1e-14;
 		static const double kOutEps  = 1e-15;
+
 		DT(){
 		}
 
@@ -33,6 +34,17 @@ class DT {
             //}
         }
 
+		static const vector< Node* >& getNodes(){
+			return nodes;
+		}
+
+        static const vector< Edge* >& getEdges(){
+			return edges;
+		}
+        static const vector< Triangle* >& getTriangles(){
+			return triangles;
+		}
+
 		bool startDT();
 
 		void setInputFile(string _infile){ 
@@ -50,9 +62,9 @@ class DT {
 		string outfile_name;
 		int    form;
 
-		vector< Node* >     nodes;
-        vector< Edge* >     edges;
-        vector< Triangle* > triangles;
+		static vector< Node* >     nodes;
+        static vector< Edge* >     edges;
+        static vector< Triangle* > triangles;
 
 		bool inputParam();
 		bool outputResult();
@@ -62,8 +74,10 @@ class DT {
         void setSuperTriangle();
 		void generateBoundary();
         void removeIllegalTriangles();
+		void generateFineMesh();
 
         vector<Triangle*>   divideTriInto3( Triangle*, Node* );
+        vector<Triangle*>   divideTriInto4( Triangle*, Node*, int );
 		Triangle*           searchTriangle( Triangle*, Node* );
 		void 			    swapTriangles( Triangle*, Triangle*, int, int );
 		vector< Triangle* > swappingAlg( stack< Triangle* >*, Node* );

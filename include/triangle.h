@@ -10,6 +10,8 @@ class Triangle {
         Node     *p[3];
         bool     isExist;
         Triangle *neighbor_triangle[3];
+		double   oblateness;
+		double   area;
     
     public:
         Triangle(){
@@ -25,9 +27,13 @@ class Triangle {
         void      setExist( bool );
         void      setNeighborTri( Triangle*, Triangle*, Triangle* );
         void      setNeighborTriOne( int, Triangle* );
+		void      calcOblateness();
+		void	  calcArea();
         Node*     getNode( unsigned int );
         bool      getExist();
         Triangle* getNeighborTri( int );
+		double    getOblateness();
+		double 	  getArea();
 };
 
 #endif /* end of include guard */
