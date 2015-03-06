@@ -74,8 +74,10 @@ class DT {
         void setSuperTriangle();
 		void generateBoundary();
         void removeIllegalTriangles();
+		void generateFineMesh();
 
         vector<Triangle*>   divideTriInto3( Triangle*, Node* );
+        vector<Triangle*>   divideTriInto4( Triangle*, Node*, int );
 		Triangle*           searchTriangle( Triangle*, Node* );
 		void 			    swapTriangles( Triangle*, Triangle*, int, int );
 		vector< Triangle* > swappingAlg( stack< Triangle* >*, Node* );

@@ -97,3 +97,8 @@ double Triangle::getOblateness()
 {
 	return oblateness;
 }
+
+double Triangle::getArea()
+{
+	return area;
+}

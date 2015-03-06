@@ -40,6 +40,7 @@ class Edge
 		}
 
 		virtual double getLength() = 0;
+		virtual Edge*  divideInto2( Node* ) = 0;
 		//virtual Point  divPoint(int n,int i) = 0;
 
 		bool isEqual( const Edge& _edge ){
@@ -60,6 +61,15 @@ class StraightEdge: public Edge{
 			double dx = fabs(p[1]->getX() - p[0]->getX() );
 			double dy = fabs(p[1]->getY() - p[0]->getY() );
 			return sqrt( dx*dx + dy*dy );
+		}
+
+		Edge* divideInto2( Node* div_node )
+		{
+			StraightEdge* new_edge = new StraightEdge( p[0], div_node );
+			p[0] = div_node;
+			new_edge->bc       = bc;
+			new_edge->material = material;
+			return new_edge;
 		}
 
 		//Point divPoint(int n,int i){

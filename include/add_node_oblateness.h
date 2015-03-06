@@ -10,6 +10,7 @@ class AddNodeOblateness :public AddNodeInterface{
 		virtual Node* getAdditionalNode();
 	private:
 		vector< Triangle* > oblOrderTriangles;
+		double min_area;     // 最小面積 これ以下の面積の要素は分割しない
 };
 
 #endif /* end of include guard */
