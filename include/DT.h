@@ -75,6 +75,7 @@ class DT {
 		void generateBoundary();
         void removeIllegalTriangles();
 		void generateFineMesh();
+		void laplace();
 
         vector<Triangle*>   divideTriInto3( Triangle*, Node* );
         vector<Triangle*>   divideTriInto4( Triangle*, Node*, int );

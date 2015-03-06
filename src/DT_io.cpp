@@ -88,8 +88,6 @@ bool DT::inputParam()
                         // ノード情報の入力
                         Node* new_node = createNewNodeFromVs( vs, scale );
                         nodes.push_back( new_node );
-
-                        //nodes.at( node.size()-1 )->isOnBnd = true;
                         break;
                     }
 
@@ -228,7 +226,9 @@ static Node* createNewNodeFromVs( const vector<string>& vs, double scale )
 {
     double px = scale * atof( vs[1].c_str() );
     double py = scale * atof( vs[2].c_str() );
-    return ( new Node( px, py ) );
+	Node* new_node = new Node( px, py );
+	new_node->setIsOnBoundary( true );
+    return new_node;
 }
 
 static Edge* createNewEdgeFromVs( const vector<string>& vs, double scale, const vector<Node*>& nodes)

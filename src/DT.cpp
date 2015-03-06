@@ -18,6 +18,7 @@ vector< Triangle* > DT::triangles;
 static double getDet( double,double ,double ,double ,double ,double );
 static double isSamePoint( Point*, Point* );
 static bool   isCrossed( StraightEdge, StraightEdge);
+static double distance( double, double, double, double );
 
 bool DT::startDT() 
 {
@@ -27,6 +28,7 @@ bool DT::startDT()
 
 	for (int i = 0; i < nodes.size(); i++) {
 		cout << i << ":(" << nodes[i]->getX() << "," << nodes[i]->getY() << ")" << endl;
+		cout << "is_on_boundary = " << nodes[i]->getIsOnBoundary() << endl;
 	}
 
 	for (int i = 0; i < edges.size(); i++) {
@@ -49,20 +51,6 @@ bool DT::startDT()
 	cout << "set SuperTriangle" << endl << endl;
     setSuperTriangle();
 
-    //Node* new_node = new Node( 0.2, 0.2 );
-	//Triangle *temp_tri = searchTriangle( triangles[0], new_node );
-
-    //nodes.push_back( new_node );
-    //vector<Triangle*> t = divideTriInto3( triangles[0], new_node );
-
-    //for (int i=0; i < t.size(); i++) {
-    //    for( int j=0; j<3; j++ ){
-    //        Node* p = triangles[i]->getNode(j);
-    //        cout << "p" << j << " = (" << p->getNum() << "," << p->getX() << "," << p->getY() << ")" << endl;
-    //    }
-    //    cout << "exist: " << triangles[i]->getExist() << endl;
-    //}
-
 	cout << "generate Boundary start" << endl << endl;
 	generateBoundary();
 	for (int i = 0; i < nodes.size(); i++) {
@@ -81,14 +69,14 @@ bool DT::startDT()
 
 	generateFineMesh();
 
-    //new_node = new Node( 0.3, 0.3 );
-	//temp_tri = searchTriangle( triangles[0], new_node );
-
 	cout << "node denormalize start" << endl << endl;
     nodesDenormalize();
 
 	cout << "remove illegal triangles start" << endl << endl;
     removeIllegalTriangles();
+
+	cout << endl << "laplace start" << endl;
+	laplace();
 
 	cout << "output result start" << endl << endl;
     outputResult();
@@ -238,6 +226,7 @@ void DT::generateFineMesh()
 				if( e.isEqual( *edges[j] ) ){
 					Edge* new_edge = edges[j]->divideInto2( new_node );
 					edges.push_back( new_edge );
+					new_node->setIsOnBoundary( true );
 				}
 			}
 			tv = divideTriInto4( t, new_node, p_index );
@@ -255,6 +244,103 @@ void DT::generateFineMesh()
 		swappingAlg( &triStack, new_node );
 
 		nodes.push_back( new_node );
+	}
+}
+
+void DT::laplace()
+{
+	const double kEpsLaplace = 1e-8;
+	vector< vector<Triangle*> > shared_triangles;
+
+	shared_triangles.resize( nodes.size() );
+	// nodes[i]を含む三角形shared_triangles[i]のベクタを用意
+	for( unsigned int ni=0; ni<nodes.size(); ni++ ){
+		if( nodes[ni]->getIsOnBoundary() || nodes[ni]->isSuperNode() ){
+			continue;
+		}
+		for( unsigned int ti=0; ti<triangles.size(); ti++ ){
+			if( !triangles[ti]->getExist() ){
+				continue;
+			}
+			for( int pi=0; pi<3; pi++ ){
+				if( nodes[ni] == triangles[ti]->getNode( pi ) ){
+					shared_triangles[ni].push_back( triangles[ti] );
+				}
+			}
+		}
+	}
+
+	double max_dr = DBL_MAX;
+	vector< Node* > poly_node;
+
+	while( max_dr > kEpsLaplace ){
+		max_dr = 0;
+		for( unsigned int ni=0; ni<nodes.size(); ni++ ){
+			if( nodes[ni]->getIsOnBoundary() || nodes[ni]->isSuperNode() ){
+				continue;
+			}
+
+			// 多角形の構成
+			poly_node.clear();
+			for( unsigned int ti=0; ti<shared_triangles[ni].size(); ti++ ){
+				for( int pi=0; pi<3; pi++){
+					if( shared_triangles[ni][ti]->getNode(pi) == nodes[ni] ){
+						Node* n = shared_triangles[ni][ti]->getNode( (pi+2)%3 );
+						poly_node.push_back( n );
+						break;
+					}
+				}
+			}
+
+			// nodes[ni]の移動
+			Point sump( 0, 0 );
+			Point prep( nodes[ni]->getX(), nodes[ni]->getY() );
+
+			for(unsigned int pi=0; pi<poly_node.size(); pi++){
+				sump.setX( sump.getX() + poly_node[pi]->getX() );
+				sump.setY( sump.getY() + poly_node[pi]->getY() );
+			}
+
+			nodes[ni]->setX( sump.getX() / poly_node.size() );
+			nodes[ni]->setY( sump.getY() / poly_node.size() );
+			
+			// 移動後の位置が許されるか判定
+			bool canSet = true;
+			for( unsigned int ti=0; ti<shared_triangles[ni].size(); ti++ ){
+				Triangle *tBase     = shared_triangles[ni][ti];
+				Triangle *tBaseNei;
+				int tBcntrInd  = -1;
+				int tBNcntrInd = -1;
+
+				for(int pi=0; pi<3; pi++){
+					if( tBase->getNode(pi) == nodes[ni] ){
+						tBaseNei  = tBase->getNeighborTri(pi);
+						tBcntrInd = pi;
+						break;
+					}
+				}
+				for(int pi=0; pi<3; pi++){
+					if( tBaseNei->getNode(pi) == nodes[ni] ){
+						tBNcntrInd = pi;
+						break;
+					}
+				}
+
+				StraightEdge e1( tBase->getNode((tBcntrInd+1)%3), tBase->getNode((tBcntrInd+2)%3) );
+				StraightEdge e2( tBaseNei->getNode(tBNcntrInd), tBaseNei->getNode((tBNcntrInd+1)%3) );
+				if(isCrossed(e1,e2)) {
+					canSet = false;
+				}
+			}
+			if( !canSet ){
+				nodes[ni]->set( prep.getX(), prep.getY() );
+			}
+
+			double dr = distance( prep.getX(), prep.getY(), nodes[ni]->getX(), nodes[ni]->getY() );
+			if( dr > max_dr ){
+				max_dr = dr;
+			}
+		}
 	}
 }
 
@@ -574,4 +660,12 @@ static bool isCrossed( StraightEdge e1, StraightEdge e2 )
 		return true;
 	}
 	return false;
+}
+
+static double distance( double x1, double y1, double x2, double y2)
+{
+  double dx = fabs( x1 - x2 );
+  double dy = fabs( y1 - y2 );
+
+  return ( sqrt( dx*dx + dy*dy ) );
 }

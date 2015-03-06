@@ -52,6 +52,7 @@ class Node: public Point
 		Node(double _x, double _y):Point(_x, _y){
 			number = num_node++;
 			val    = 0;
+			is_on_boundary = false;
 		}
 
         virtual ~Node() {}
